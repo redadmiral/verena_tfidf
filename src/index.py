@@ -14,7 +14,6 @@ class Article:
         self.text: str = text
         self.source: str = source
 
-
     def termfrequency(self, term: str, normalize: bool = True) -> float | int:
         """
         Returns the frequency of a given term in the document.
@@ -23,6 +22,9 @@ class Article:
         :return: the frequency of the term as float value if normalize = True, else an integer
         """
         # tf(t, d) = count of t in d / number of words in d
+        if len(self.text) == 0:
+            return 0
+
         if normalize:
             term_frequency = self.text.count(term) / len(self.text)
         else:
@@ -39,13 +41,13 @@ class Index:
     def __init__(self):
         self.articles: List[Article] = []
 
-    def add(self, article: Article) -> None: #ohne return-statement, weil nichts returned wird?
+    def add(self, article: Article) -> None:
         """
         Add an article to the list.
         :param article:
         :return:
         """
-        return self.articles.append(article)
+        self.articles.append(article)
 
     def idf(self, term, normalize: bool = True) -> float:
         """
@@ -55,8 +57,8 @@ class Index:
         :return:
         """
         df = 0
-        for article in self.articles:
-            if term in article:
+        for article in self.articles: #article ist eine Instanz von Article mit text, title und source.
+            if term in article.text:
                 df += 1
         if normalize:
             idf = (np.log(len(self.articles)/(df+1))) / len(self.articles)
@@ -76,9 +78,8 @@ class Index:
         #tf-idf(t, D) = (tf(t, D) x idf(t))
         tfidf_list = []
         for article in self.articles:
-            tfidf = Article.termfrequency(query) * self.idf(query)
-            tfidf_dict = {article.title: tfidf}
-            tfidf_list.append(tfidf_dict)
+            tfidf = article.termfrequency(query) * self.idf(query)
+            tfidf_list.append({"title": article.title, "score": tfidf})
 
-        return tfidf_list.sort(key=lambda x: x['tfidf'])[:limit]
-
+        tfidf_list.sort(key=lambda x: x["score"], reverse=True)
+        return tfidf_list[:limit]
