@@ -76,10 +76,13 @@ class Index:
         :return: A list of dictionaries consisting of the articles and the search score.
         """
         #tf-idf(t, D) = (tf(t, D) x idf(t))
+
+        terms = query.split(" ")
         tfidf_list = []
         for article in self.articles:
-            tfidf = article.termfrequency(query) * self.idf(query)
-            tfidf_list.append({"title": article.title, "score": tfidf})
+            sum_single_tfidf = sum(article.termfrequency(term) * self.idf(term) for term in terms)
+            #tfidf = article.termfrequency(query) * self.idf(query)
+            tfidf_list.append({"title": article.title, "score": sum_single_tfidf})
 
         tfidf_list.sort(key=lambda x: x["score"], reverse=True)
         return tfidf_list[:limit]
