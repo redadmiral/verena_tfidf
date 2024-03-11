@@ -9,6 +9,6 @@ with open("data/cleaned.jsonl") as f:
         a = json.loads(row)
         index.add(Article(title=a['title'], text=a['text'], source=a['shareUrl']))
 
-query = "Voker Heißmann Fasching Orden"
+query = "Volker Heißmann Fasching Orden"
 
 print(json.dumps(index.search(query, limit=5), indent=4, ensure_ascii=False))

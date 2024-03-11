@@ -1,8 +1,5 @@
 from typing import List, Dict
-import json
-import math
 import numpy as np
-PATH = "./data/cleaned.jsonl"
 
 
 class Article:
@@ -26,7 +23,7 @@ class Article:
             return 0
 
         if normalize:
-            term_frequency = self.text.count(term) / len(self.text)
+            term_frequency = self.text.count(term) / len(self.text.split(" "))
         else:
             term_frequency = self.text.count(term)
 
@@ -60,10 +57,13 @@ class Index:
         for article in self.articles: #article ist eine Instanz von Article mit text, title und source.
             if term in article.text:
                 df += 1
+        try:
+            idf = np.log(len(self.articles) / df)
+        except ZeroDivisionError:
+            idf = 0
+
         if normalize:
-            idf = (np.log(len(self.articles)/(df+1))) / len(self.articles)
-        else:
-            idf = np.log(len(self.articles)/(df+1))
+            idf = idf / len(self.articles)
 
         return idf
 
@@ -86,3 +86,7 @@ class Index:
 
         tfidf_list.sort(key=lambda x: x["score"], reverse=True)
         return tfidf_list[:limit]
+
+
+
+
